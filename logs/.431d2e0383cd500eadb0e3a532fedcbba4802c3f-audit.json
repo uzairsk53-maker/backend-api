@@ -1,0 +1,35 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "E:\\SHOP UZAIR\\backend\\logs\\.431d2e0383cd500eadb0e3a532fedcbba4802c3f-audit.json",
+    "files": [
+        {
+            "date": 1777382988561,
+            "name": "E:\\SHOP UZAIR\\backend\\logs\\combined-2026-04-28.log",
+            "hash": "5ee5de9803701e9613b196b591209a1bc3bc394a585cb26cd3218653bd5638d4"
+        },
+        {
+            "date": 1777401464257,
+            "name": "E:\\SHOP UZAIR\\backend\\logs\\combined-2026-04-29.log",
+            "hash": "1eb05eda5fceda43ba315ffbc1d4faa4e9e1d258db24abcd98034d9909921664"
+        },
+        {
+            "date": 1777621522290,
+            "name": "E:\\SHOP UZAIR\\backend\\logs\\combined-2026-05-01.log",
+            "hash": "8c335357bd24ea200f8b838143333e43ce4a4eafc12068e8a3c95325cf7dcce2"
+        },
+        {
+            "date": 1777661971185,
+            "name": "E:\\SHOP UZAIR\\backend\\logs\\combined-2026-05-02.log",
+            "hash": "d5ec0a35df2f4d35d5026c289a4679b575520322a23e86770dbf2f51dde3fcbe"
+        },
+        {
+            "date": 1777746665196,
+            "name": "E:\\SHOP UZAIR\\backend\\logs\\combined-2026-05-03.log",
+            "hash": "24aafa4eff5038c648a6c8da4fd5806113d37719c0afda2d72b4e946a49bd37c"
+        }
+    ],
+    "hashType": "sha256"
+}

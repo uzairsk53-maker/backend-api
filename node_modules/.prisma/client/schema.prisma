@@ -1,0 +1,337 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  phone        String   @unique @db.VarChar(15)
+  email        String?  @unique @db.VarChar(255)
+  password     String   @db.Text
+  role         Role     @default(SHOPKEEPER)
+  refreshToken String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Relations
+  shopkeeper Shopkeeper?
+  orders     Order[]     @relation("DeliveryOrders")
+
+  @@map("users")
+}
+
+model Shopkeeper {
+  id           String          @id @default(uuid()) @db.Uuid
+  userId       String          @unique @map("user_id") @db.Uuid
+  shopName     String          @map("shop_name") @db.Text
+  ownerName    String          @map("owner_name") @db.Text
+  phone        String?         @db.VarChar(15)
+  email        String?         @db.VarChar(255)
+  address      String?         @db.Text
+  city         String?         @db.Text
+  creditScore  Int             @default(10000) @map("credit_score")
+  creditPoints Int             @default(0) @map("credit_points")
+  riskLevel    RiskLevel       @default(LOW) @map("risk_level")
+  status       ShopkeeperStatus @default(ACTIVE)
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime        @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Relations
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders             Order[]
+  repayments         RepaymentHistory[]
+  creditTransactions CreditTransaction[]
+
+  @@map("shopkeepers")
+}
+
+model Product {
+  id                   String         @id @default(uuid()) @db.Uuid
+  name                 String         @db.Text
+  category             String         @db.Text
+  description          String?        @db.Text
+  price                Decimal        @db.Decimal(10, 2)
+  creditPrice          Decimal?       @map("credit_price") @db.Decimal(10, 2)
+  bulkPrice            Decimal?       @map("bulk_price") @db.Decimal(10, 2)
+  stock                Int            @default(0)
+  images               String[]       @db.Text
+  fastDeliveryEligible Boolean        @default(false) @map("fast_delivery_eligible")
+  isActive             Boolean        @default(true) @map("is_active")
+  createdAt            DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt            DateTime       @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Relations
+  orderItems   OrderItem[]
+  productImages ProductImage[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  url       String   @db.Text
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model Order {
+  id                String      @id @default(uuid()) @db.Uuid
+  shopkeeperId      String      @map("shopkeeper_id") @db.Uuid
+  deliveryBoyId     String?     @map("delivery_boy_id") @db.Uuid
+  totalAmount       Decimal     @map("total_price") @db.Decimal(10, 2)
+  orderType         OrderType   @default(NORMAL) @map("order_type")
+  creditUsed        Decimal     @default(0) @map("credit_used")
+  cashAmount        Decimal     @default(0) @map("cash_amount")
+  paymentType       PaymentType
+  status            OrderStatus @default(PENDING)
+  expectedDelivery  DateTime    @map("expected_delivery") @db.Timestamp(6)
+  repaymentDeadline DateTime?   @map("repayment_deadline") @db.Timestamp(6)
+  cancelReason      String?     @map("cancel_reason") @db.Text
+  createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt         DateTime    @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Relations
+  shopkeeper          Shopkeeper           @relation(fields: [shopkeeperId], references: [id])
+  deliveryBoy         User?                @relation("DeliveryOrders", fields: [deliveryBoyId], references: [id])
+  products            OrderItem[]
+  creditTransactions  CreditTransaction[]
+  deliveryAssignments DeliveryAssignment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String  @id @default(uuid()) @db.Uuid
+  orderId      String  @map("order_id") @db.Uuid
+  productId    String  @map("product_id") @db.Uuid
+  quantity     Int
+  priceAtOrder Decimal @map("price_at_order") @db.Decimal(10, 2)
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model DeliveryBoy {
+  id        String            @id @default(uuid()) @db.Uuid
+  name      String            @db.Text
+  phone     String            @unique @db.VarChar(15)
+  email     String?           @db.VarChar(255)
+  isActive  Boolean           @default(true) @map("is_active")
+  vehicleNo String?           @map("vehicle_no") @db.VarChar(20)
+  city      String?           @db.Text
+  createdAt DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime          @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Relations
+  assignments DeliveryAssignment[]
+
+  @@map("delivery_boys")
+}
+
+model DeliveryAssignment {
+  id            String                   @id @default(uuid()) @db.Uuid
+  orderId       String                   @map("order_id") @db.Uuid
+  deliveryBoyId String                   @map("delivery_boy_id") @db.Uuid
+  status        DeliveryAssignmentStatus @default(ASSIGNED)
+  assignedAt    DateTime                 @default(now()) @map("assigned_at") @db.Timestamp(6)
+  pickedAt      DateTime?                @map("picked_at") @db.Timestamp(6)
+  deliveredAt   DateTime?                @map("delivered_at") @db.Timestamp(6)
+  notes         String?                  @db.Text
+  createdAt     DateTime                 @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime                 @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Relations
+  order       Order       @relation(fields: [orderId], references: [id])
+  deliveryBoy DeliveryBoy @relation(fields: [deliveryBoyId], references: [id])
+
+  @@map("delivery_assignments")
+}
+
+model CreditTransaction {
+  id           String            @id @default(uuid()) @db.Uuid
+  shopkeeperId String            @map("shopkeeper_id") @db.Uuid
+  orderId      String?           @map("order_id") @db.Uuid
+  type         TransactionType
+  amount       Decimal           @db.Decimal(10, 2)
+  description  String?           @db.Text
+  dueDate      DateTime?         @map("due_date") @db.Timestamp(6)
+  status       TransactionStatus @default(CLEARED)
+  isPenalty    Boolean           @default(false) @map("is_penalty")
+  isManual     Boolean           @default(false) @map("is_manual")
+  adjustedBy   String?           @map("adjusted_by") @db.Uuid
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime          @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Relations
+  shopkeeper Shopkeeper @relation(fields: [shopkeeperId], references: [id])
+  order      Order?     @relation(fields: [orderId], references: [id])
+
+  @@map("credit_transactions")
+}
+
+model CreditSetting {
+  id                   String   @id @default(uuid()) @db.Uuid
+  key                  String   @unique @db.VarChar(100)
+  value                String   @db.Text
+  label                String   @db.Text
+  description          String?  @db.Text
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("credit_settings")
+}
+
+model CreditPenaltyRule {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.Text
+  description String?  @db.Text
+  condition   String   @db.Text
+  penaltyType String   @map("penalty_type") @db.VarChar(20)
+  value       Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("credit_penalty_rules")
+}
+
+model CreditBonusRule {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.Text
+  description String?  @db.Text
+  condition   String   @db.Text
+  bonusType   String   @map("bonus_type") @db.VarChar(20)
+  value       Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("credit_bonus_rules")
+}
+
+model ManualRepayment {
+  id           String          @id @default(uuid()) @db.Uuid
+  shopkeeperId String          @map("shopkeeper_id") @db.Uuid
+  amount       Decimal         @db.Decimal(10, 2)
+  collectedBy  String          @map("collected_by") @db.Uuid
+  notes        String?         @db.Text
+  status       RepaymentStatus @default(PENDING)
+  confirmedAt  DateTime?       @map("confirmed_at") @db.Timestamp(6)
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime        @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("manual_repayments")
+}
+
+model RepaymentHistory {
+  id             Int             @id @default(autoincrement())
+  shopkeeperId   String          @map("shopkeeper_id") @db.Uuid
+  amount         Decimal         @db.Decimal(10, 2)
+  date           DateTime        @db.Timestamp(6)
+  status         RepaymentStatus
+  pointsRewarded Int?            @map("points_rewarded")
+  penalty        Decimal?        @db.Decimal(10, 2)
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Relations
+  shopkeeper Shopkeeper @relation(fields: [shopkeeperId], references: [id], onDelete: Cascade)
+
+  @@map("repayment_history")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  action     String   @db.VarChar(100)
+  entity     String   @db.VarChar(100)
+  entityId   String?  @map("entity_id") @db.Uuid
+  oldData    Json?    @map("old_data")
+  newData    Json?    @map("new_data")
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  userAgent  String?  @map("user_agent") @db.Text
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@map("audit_logs")
+}
+
+enum Role {
+  ADMIN
+  SHOPKEEPER
+  DELIVERY
+}
+
+enum OrderType {
+  NORMAL
+  BULK
+  FAST_DELIVERY
+}
+
+enum PaymentType {
+  CASH
+  CREDIT
+  HYBRID
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  PACKED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum TransactionType {
+  DEBIT
+  CREDIT
+}
+
+enum TransactionStatus {
+  CLEARED
+  PENDING
+  OVERDUE
+}
+
+enum RepaymentStatus {
+  ON_TIME
+  LATE
+  PENDING
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ShopkeeperStatus {
+  ACTIVE
+  BLOCKED
+  SUSPENDED
+}
+
+enum DeliveryAssignmentStatus {
+  ASSIGNED
+  PICKED
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}

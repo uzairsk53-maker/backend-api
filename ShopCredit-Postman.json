@@ -1,0 +1,68 @@
+{
+    "info": {
+        "_postman_id": "18f1dc85-2e6b-4e8c-8f25-bb35d2d0b5ae",
+        "name": "Shop Credit App v1",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register Shopkeeper",
+                    "request": {
+                        "method": "POST",
+                        "header": [{"key":"Content-Type","value":"application/json"}],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"phone\": \"9876543210\",\n    \"password\": \"secure_password\",\n    \"shopName\": \"Super Store\",\n    \"ownerName\": \"John Doe\",\n    \"address\": \"123 Main St\",\n    \"city\": \"New York\"\n}"
+                        },
+                        "url": {"raw": "http://localhost:5000/api/v1/auth/register-shopkeeper","protocol": "http","host": ["localhost"],"port": "5000","path": ["api","v1","auth","register-shopkeeper"]}
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [{"key":"Content-Type","value":"application/json"}],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"phone\": \"9876543210\",\n    \"password\": \"secure_password\",\n    \"role\": \"SHOPKEEPER\"\n}"
+                        },
+                        "url": {"raw": "http://localhost:5000/api/v1/auth/login","protocol": "http","host": ["localhost"],"port": "5000","path": ["api","v1","auth","login"]}
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Product",
+            "item": [
+                {
+                    "name": "Get Product List",
+                    "request": {
+                        "method": "GET",
+                        "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+                        "url": {"raw": "http://localhost:5000/api/v1/product","protocol": "http","host": ["localhost"],"port": "5000","path": ["api","v1","product"]}
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Order",
+            "item": [
+                {
+                    "name": "Create Order",
+                    "request": {
+                        "method": "POST",
+                        "header": [{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"products\": [\n        { \"productId\": \"<replace_with_id>\", \"quantity\": 10, \"priceAtOrder\": 500 }\n    ],\n    \"orderType\": \"NORMAL\",\n    \"totalAmount\": 5000,\n    \"creditUsed\": 2000,\n    \"cashAmount\": 3000,\n    \"paymentType\": \"HYBRID\",\n    \"expectedDelivery\": \"2024-12-31T00:00:00Z\"\n}"
+                        },
+                        "url": {"raw": "http://localhost:5000/api/v1/order","protocol": "http","host": ["localhost"],"port": "5000","path": ["api","v1","order"]}
+                    }
+                }
+            ]
+        }
+    ]
+}
