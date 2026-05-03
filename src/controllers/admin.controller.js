@@ -28,7 +28,7 @@ class AdminController {
   async updateProduct(req, res) { try { const b = this.validate(updateProductSchema, req.body, res); if (!b) return; return successResponse(res, await adminService.updateProduct(req.user.id, req.params.id, b), 'Product updated'); } catch (e) { return errorResponse(res, 400, e.message); } }
   async deleteProduct(req, res) { try { await adminService.deleteProduct(req.user.id, req.params.id); return successResponse(res, null, 'Product deleted'); } catch (e) { return errorResponse(res, 400, e.message); } }
   async bulkUploadProducts(req, res) { try { if (!req.file) return errorResponse(res, 400, 'Excel file is required'); return successResponse(res, await adminService.bulkUploadProducts(req.user.id, req.file), 'Bulk upload complete'); } catch (e) { return errorResponse(res, 400, e.message); } }
-  async uploadImages(req, res) { try { const urls = (req.files || []).map((f) => `/uploads/${f.filename}`); return successResponse(res, { urls }, 'Images uploaded'); } catch (e) { return errorResponse(res, 400, e.message); } }
+  async uploadImages(req, res) { try { const urls = (req.files || []).map((f) => f.path.startsWith('http') ? f.path : `/uploads/${f.filename}`); return successResponse(res, { urls }, 'Images uploaded'); } catch (e) { return errorResponse(res, 400, e.message); } }
 
   async getOrders(req, res) { try { return successResponse(res, await adminService.getOrders(req.query), 'Orders fetched'); } catch (e) { return errorResponse(res, 500, e.message); } }
   async getOrderById(req, res) { try { return successResponse(res, await adminService.getOrderById(req.params.id), 'Order fetched'); } catch (e) { return errorResponse(res, 404, e.message); } }
