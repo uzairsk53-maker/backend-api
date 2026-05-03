@@ -31,7 +31,7 @@ class AdminService {
     });
 
     if (files.length) {
-      await adminRepo.createProductImages(files.map((f, i) => ({ productId: product.id, url: `/uploads/${f.filename}`, sortOrder: i })));
+      await adminRepo.createProductImages(files.map((f, i) => ({ productId: product.id, url: f.path && f.path.startsWith('http') ? f.path : `/uploads/${f.filename}`, sortOrder: i })));
     }
 
     await this.logAudit(adminUserId, 'CREATE', 'PRODUCT', product.id, null, product);
