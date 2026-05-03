@@ -24,18 +24,38 @@ appEmitter.on('orderCreated', order => io.emit('orderCreated', order));
 appEmitter.on('orderStatusUpdated', order => io.emit(`orderStatusUpdated_${order.id}`, order));
 appEmitter.on('deliveryAssigned', order => io.emit('deliveryAssigned', order));
 
-// 🔐 FIXED Helmet (important)
+/* =========================
+   🔐 SECURITY FIX (IMPORTANT)
+========================= */
+
+// ❗ CHANGE THIS
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: false
 }));
 
 app.use(cors());
 app.use(express.json());
 
-// ✅ ONLY ONE uploads static (correct path)
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-app.use('/uploads', express.static(path.join(process.cwd(), 'src', 'uploads')));
-// 🚫 DDoS Protection
+/* =========================
+   📸 IMAGE FIX (VERY IMPORTANT)
+========================= */
+
+// ✅ uploads with proper headers
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(process.cwd(), 'uploads')));
+
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(process.cwd(), 'src', 'uploads')));
+
+/* =========================
+   🚫 DDoS Protection
+========================= */
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 150,
@@ -44,30 +64,43 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// 📄 Logger
+/* =========================
+   📄 Logger
+========================= */
 const morgan = require('morgan');
 app.use(morgan('combined', {
   stream: { write: message => logger.info(message.trim()) }
 }));
 
-// ❤️ Health Check
+/* =========================
+   ❤️ Health
+========================= */
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'Shop Credit App Enterprise API v1' });
 });
 
-// 📘 Swagger
+/* =========================
+   📘 Swagger
+========================= */
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// 🚀 Routes
+/* =========================
+   🚀 Routes
+========================= */
 app.use('/api/v1', require('./src/routes/index'));
 
-// ❌ Error Handler
+/* =========================
+   ❌ Error Handler
+========================= */
 const { errorResponse } = require('./src/utils/response');
 app.use((err, req, res, next) => {
   logger.error(`${err.status || 500} - ${err.message}`);
   return errorResponse(res, 500, 'Internal Server Error', err.message);
 });
 
+/* =========================
+   🚀 Server Start
+========================= */
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
