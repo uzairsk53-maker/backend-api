@@ -8,14 +8,14 @@ async function main() {
 
  await prisma.user.upsert({
   where: {
-    phone: "7385826947",
+    phone: "7385998510",
   },
   update: {
     password: hashedPassword,
     role: "ADMIN",
   },
   create: {
-    phone: "7385826947",
+    phone: "7385998510",
     password: hashedPassword,
     role: "ADMIN",
   },
