@@ -41,17 +41,24 @@ app.use(express.json());
 ========================= */
 
 // ✅ uploads with proper headers
-app.use('/uploads', (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-  next();
-}, express.static(path.join(process.cwd(), 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, path, stat) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
 
-app.use('/uploads', (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-  next();
-}, express.static(path.join(process.cwd(), 'src', 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'src', 'uploads'), {
+  setHeaders: (res, path, stat) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
+
+// Fallback for missing uploads to prevent ORB (Opaque Response Blocking) from HTML 404s
+app.use('/uploads', (req, res) => {
+  res.status(404).json({ success: false, message: 'Image not found. It may have been deleted by Render ephemeral storage.' });
+});
 
 /* =========================
    🚫 DDoS Protection
