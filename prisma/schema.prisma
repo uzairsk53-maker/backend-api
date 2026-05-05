@@ -37,6 +37,8 @@ model Shopkeeper {
   email        String?         @db.VarChar(255)
   address      String?         @db.Text
   city         String?         @db.Text
+  latitude     Decimal?        @db.Decimal(10, 8)
+  longitude    Decimal?        @db.Decimal(11, 8)
   creditScore  Int             @default(10000) @map("credit_score")
   creditPoints Int             @default(0) @map("credit_points")
   riskLevel    RiskLevel       @default(LOW) @map("risk_level")

@@ -6,7 +6,9 @@ const updateProfileSchema = Joi.object({
     phone: Joi.string().optional(),
     address: Joi.string().optional(),
     city: Joi.string().optional(),
-    email: Joi.string().email().optional()
+    email: Joi.string().email().optional(),
+    latitude: Joi.number().optional(),
+    longitude: Joi.number().optional()
 });
 
 module.exports = {
