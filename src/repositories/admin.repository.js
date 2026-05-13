@@ -303,8 +303,8 @@ class AdminRepository {
         take: limit,
         orderBy: { createdAt: 'desc' },
         include: {
-          order: { include: { shopkeeper: { select: { shopName: true } } } },
-          deliveryBoy: { select: { name: true, phone: true } },
+          order: { include: { shopkeeper: { select: { shopName: true, latitude: true, longitude: true, address: true } } } },
+          deliveryBoy: { select: { name: true, phone: true, latitude: true, longitude: true } },
         },
       }),
       prisma.deliveryAssignment.count({ where }),

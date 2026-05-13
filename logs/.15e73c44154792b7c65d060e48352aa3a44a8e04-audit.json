@@ -34,6 +34,16 @@
             "date": 1777833153629,
             "name": "E:\\SHOP UZAIR\\backend\\logs\\error-2026-05-04.log",
             "hash": "7a62a327601ce840b44059345dd07518db20a1840c6fa2931b1bd3cf1ad26c25"
+        },
+        {
+            "date": 1778051883405,
+            "name": "E:\\SHOP UZAIR\\backend\\logs\\error-2026-05-06.log",
+            "hash": "09a4748a500ac7db90efee7e7a27b75ca76cd72d97b033da7147b7bbe6dc14f4"
+        },
+        {
+            "date": 1778579115367,
+            "name": "E:\\SHOP UZAIR\\backend\\logs\\error-2026-05-12.log",
+            "hash": "8996ba614b24638685513d9d8f04868e90def0eb7ce4876cb84b159e1f50012e"
         }
     ],
     "hashType": "sha256"

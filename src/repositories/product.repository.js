@@ -1,3 +1,4 @@
+
 const { prisma } = require('../config/db');
 
 class ProductRepository {

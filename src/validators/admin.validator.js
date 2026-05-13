@@ -33,6 +33,8 @@ const createDeliveryBoySchema = Joi.object({
   email: Joi.string().email().allow('', null),
   vehicleNo: Joi.string().allow('', null),
   city: Joi.string().allow('', null),
+  latitude: Joi.number().allow(null),
+  longitude: Joi.number().allow(null),
   isActive: Joi.boolean().default(true),
   // password is intentionally excluded — stripUnknown drops it before Prisma sees it
 }).options({ stripUnknown: true });
@@ -46,6 +48,12 @@ const penaltyRuleSchema = Joi.object({ name: Joi.string().required(), descriptio
 const bonusRuleSchema = Joi.object({ name: Joi.string().required(), description: Joi.string().allow('', null), condition: Joi.string().required(), bonusType: Joi.string().valid('PERCENT', 'FLAT').required(), value: Joi.number().min(0).required(), isActive: Joi.boolean().default(true) });
 const manualAdjustmentSchema = Joi.object({ shopkeeperId: Joi.string().uuid().required(), type: Joi.string().valid('DEBIT', 'CREDIT').required(), amount: Joi.number().positive().required(), description: Joi.string().allow('', null) });
 const manualRepaymentSchema = Joi.object({ shopkeeperId: Joi.string().uuid().required(), amount: Joi.number().positive().required(), notes: Joi.string().allow('', null) });
+const updateShopkeeperSchema = Joi.object({
+  latitude: Joi.number().allow(null),
+  longitude: Joi.number().allow(null),
+  city: Joi.string().allow('', null),
+  address: Joi.string().allow('', null)
+});
 
 module.exports = {
   paginationQuerySchema,
@@ -64,4 +72,5 @@ module.exports = {
   bonusRuleSchema,
   manualAdjustmentSchema,
   manualRepaymentSchema,
+  updateShopkeeperSchema,
 };

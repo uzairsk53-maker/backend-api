@@ -39,6 +39,7 @@ class AdminController {
 
   async getShopkeepers(req, res) { try { return successResponse(res, await adminService.getShopkeepers(req.query), 'Shopkeepers fetched'); } catch (e) { return errorResponse(res, 500, e.message); } }
   async getShopkeeperById(req, res) { try { return successResponse(res, await adminRepo.findShopkeeperById(req.params.id), 'Shopkeeper fetched'); } catch (e) { return errorResponse(res, 404, e.message); } }
+  async updateShopkeeper(req, res) { try { const b = this.validate(require('../validators/admin.validator').updateShopkeeperSchema, req.body, res); if (!b) return; return successResponse(res, await adminRepo.updateShopkeeperDetails(req.params.id, b), 'Shopkeeper updated'); } catch (e) { return errorResponse(res, 400, e.message); } }
   async blockShopkeeper(req, res) { try { return successResponse(res, await adminService.blockShopkeeper(req.user.id, req.params.id), 'Shopkeeper blocked'); } catch (e) { return errorResponse(res, 400, e.message); } }
   async unblockShopkeeper(req, res) { try { return successResponse(res, await adminService.unblockShopkeeper(req.user.id, req.params.id), 'Shopkeeper unblocked'); } catch (e) { return errorResponse(res, 400, e.message); } }
   async resetCreditScore(req, res) { try { return successResponse(res, await adminService.resetCreditScore(req.user.id, req.params.id), 'Credit score reset'); } catch (e) { return errorResponse(res, 400, e.message); } }
