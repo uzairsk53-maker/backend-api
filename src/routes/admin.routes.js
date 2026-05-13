@@ -66,6 +66,7 @@ router.put('/orders/:id/cancel', adminController.cancelOrder.bind(adminControlle
 
 router.get('/shopkeepers', adminController.getShopkeepers.bind(adminController));
 router.get('/shopkeepers/:id', adminController.getShopkeeperById.bind(adminController));
+router.put('/shopkeepers/:id', adminController.updateShopkeeper.bind(adminController));
 router.put('/shopkeepers/:id/block', adminController.blockShopkeeper.bind(adminController));
 router.put('/shopkeepers/:id/unblock', adminController.unblockShopkeeper.bind(adminController));
 router.put('/shopkeepers/:id/reset-credit-score', adminController.resetCreditScore.bind(adminController));

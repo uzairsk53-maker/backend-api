@@ -138,6 +138,8 @@ model DeliveryBoy {
   isActive  Boolean           @default(true) @map("is_active")
   vehicleNo String?           @map("vehicle_no") @db.VarChar(20)
   city      String?           @db.Text
+  latitude  Decimal?          @db.Decimal(10, 8)
+  longitude Decimal?          @db.Decimal(11, 8)
   createdAt DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt DateTime          @updatedAt @map("updated_at") @db.Timestamp(6)
 

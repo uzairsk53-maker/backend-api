@@ -5,24 +5,14 @@ const { verifyToken, requireRole } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 router.use(verifyToken);
-router.use(requireRole(['ADMIN'])); // Only admin can CRUD delivery boys
 
-/**
- * @swagger
- * /api/v1/delivery:
- *   post:
- *     summary: Create new delivery boy
- *     tags: [Delivery]
- */
-router.post('/', deliveryController.createDeliveryBoy.bind(deliveryController));
+// Delivery Boy Profile (Accessible by DELIVERY role)
+router.get('/profile', requireRole(['DELIVERY']), deliveryController.getProfile.bind(deliveryController));
+router.put('/profile', requireRole(['DELIVERY']), deliveryController.updateProfile.bind(deliveryController));
+router.put('/location', requireRole(['DELIVERY']), deliveryController.updateLocation.bind(deliveryController));
 
-/**
- * @swagger
- * /api/v1/delivery:
- *   get:
- *     summary: View list of delivery boys
- *     tags: [Delivery]
- */
-router.get('/', deliveryController.getDeliveryBoys.bind(deliveryController));
+// Admin routes
+router.post('/', requireRole(['ADMIN']), deliveryController.createDeliveryBoy.bind(deliveryController));
+router.get('/', requireRole(['ADMIN']), deliveryController.getDeliveryBoys.bind(deliveryController));
 
 module.exports = router;
