@@ -61,6 +61,23 @@ class OrderRepository {
                     include: {
                         product: true
                     }
+                },
+                deliveryAssignments: {
+                    include: {
+                        deliveryBoy: {
+                            select: {
+                                id: true,
+                                name: true,
+                                phone: true,
+                                latitude: true,
+                                longitude: true
+                            }
+                        }
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    },
+                    take: 1
                 }
             }
         });
